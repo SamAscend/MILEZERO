@@ -20,7 +20,7 @@ export async function POST(request: Request) {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "llama-3.1-8b-instant",
         messages: [
           {
             role: "system",
@@ -37,11 +37,16 @@ export async function POST(request: Request) {
 
     const data = await response.json();
     if (!response.ok) {
-      return NextResponse.json({ error: "The archive assistant could not respond right now." }, { status: response.status });
+      const providerMessage = typeof data.error?.message === "string"
+        ? data.error.message
+        : "Groq rejected the request.";
+      console.error("Groq API error", response.status, providerMessage);
+      return NextResponse.json({ error: `Groq error (${response.status}): ${providerMessage}` }, { status: 502 });
     }
 
     return NextResponse.json({ text: data.choices?.[0]?.message?.content ?? "I could not find that in the archive yet." });
-  } catch {
+  } catch (error) {
+    console.error("Chat route error", error);
     return NextResponse.json({ error: "The archive assistant could not respond right now." }, { status: 500 });
   }
 }
