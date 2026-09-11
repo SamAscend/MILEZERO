@@ -5,11 +5,28 @@ import { useEffect, useRef, useState } from "react";
 type Message = { role: "assistant" | "user"; text: string };
 
 const quickQuestions = ["Who are the first five?", "What was the latest run?", "Why Mile Zero?"];
+const wait = (duration: number) => new Promise((resolve) => setTimeout(resolve, duration));
+
+function plainText(text: string) {
+  return text
+    .replace(/^#{1,6}\s*/gm, "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/[*_`]/g, "")
+    .replace(/\|/g, " ")
+    .replace(/<br\s*\/?>(\s*)/gi, "$1")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function splitSentences(text: string) {
+  return text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)?.map((sentence) => sentence.trim()).filter(Boolean) ?? [text];
+}
 
 export default function ArchiveAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", text: "Welcome to the MILEZERO archive. What do you want to remember?" },
@@ -21,7 +38,7 @@ export default function ArchiveAssistant() {
 
   const sendMessage = async (text = input) => {
     const trimmed = text.trim();
-    if (!trimmed || isLoading) return;
+    if (!trimmed || isLoading || isTyping) return;
     const nextMessages = [...messages, { role: "user" as const, text: trimmed }];
     setMessages(nextMessages);
     setInput("");
@@ -34,11 +51,27 @@ export default function ArchiveAssistant() {
         body: JSON.stringify({ messages: nextMessages.map((message) => ({ role: message.role, content: message.text })) }),
       });
       const data = await response.json();
-      setMessages((current) => [...current, { role: "assistant", text: data.text ?? data.error ?? "The archive assistant is unavailable." }]);
+      const responseText = plainText(data.text ?? data.error ?? "The archive assistant is unavailable.");
+      setIsLoading(false);
+      setIsTyping(true);
+      setMessages((current) => [...current, { role: "assistant", text: "" }]);
+
+      let revealed = "";
+      for (const sentence of splitSentences(responseText)) {
+        await wait(180);
+        revealed = `${revealed}${revealed ? " " : ""}${sentence}`;
+        setMessages((current) => {
+          const updated = [...current];
+          const lastMessage = updated.length - 1;
+          updated[lastMessage] = { role: "assistant", text: revealed };
+          return updated;
+        });
+      }
     } catch {
       setMessages((current) => [...current, { role: "assistant", text: "The archive assistant is unavailable right now." }]);
     } finally {
       setIsLoading(false);
+      setIsTyping(false);
     }
   };
 

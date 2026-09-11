@@ -1,7 +1,23 @@
+import { appendFile, mkdir } from "node:fs/promises";
+import path from "node:path";
 import { NextResponse } from "next/server";
 import { achievements, activities, members, timeline } from "@/data/milezero";
 
 const archiveContext = JSON.stringify({ members, activities, achievements, timeline });
+
+async function saveChatHistory(userMessage: string, assistantMessage: string) {
+  try {
+    const historyDirectory = path.join(process.cwd(), "data");
+    await mkdir(historyDirectory, { recursive: true });
+    await appendFile(
+      path.join(historyDirectory, "chat-history.jsonl"),
+      `${JSON.stringify({ timestamp: new Date().toISOString(), user: userMessage, assistant: assistantMessage })}\n`,
+      "utf8",
+    );
+  } catch (error) {
+    console.error("Chat history could not be saved", error);
+  }
+}
 
 export async function POST(request: Request) {
   const apiKey = process.env.GROQ_API_KEY;
@@ -52,7 +68,10 @@ Archive context: ${archiveContext}`,
       return NextResponse.json({ error: `Groq error (${response.status}): ${providerMessage}` }, { status: 502 });
     }
 
-    return NextResponse.json({ text: data.choices?.[0]?.message?.content ?? "I could not find that in the archive yet." });
+    const assistantText = data.choices?.[0]?.message?.content ?? "I could not find that in the archive yet.";
+    const latestUserMessage = messages.at(-1)?.content ?? "";
+    await saveChatHistory(latestUserMessage, assistantText);
+    return NextResponse.json({ text: assistantText });
   } catch (error) {
     console.error("Chat route error", error);
     return NextResponse.json({ error: "The archive assistant could not respond right now." }, { status: 500 });
