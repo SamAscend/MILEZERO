@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { activities, achievements, gallery, members, timeline } from "@/data/milezero";
+import ArchiveAssistant from "@/components/ArchiveAssistant";
 
 const navItems = ["About", "Members", "Activities", "Achievements", "Gallery", "Timeline"];
 const galleryFilters = ["All", "Runs", "Crew", "Night", "Morning", "Moments"];
@@ -56,6 +57,7 @@ export default function Home() {
       <footer className="footer section-dark"><div className="page-width"><div className="footer-top"><h2>Every run<br /><em>starts somewhere.</em></h2><a className="circle-link" href="#top" aria-label="Back to top">↑</a></div><div className="footer-bottom"><span>MILEZERO</span><span>Running crew · Est. 2026</span><span>Jakarta, Indonesia</span><a href="#top">Back to top ↑</a></div></div></footer>
 
       {selectedImage && <div className="lightbox" role="dialog" aria-modal="true" onClick={() => setSelectedImage(null)}><ImagePanel image={selectedImage} title="Gallery preview" className="lightbox-image" /><button onClick={() => setSelectedImage(null)} aria-label="Close image">Close ×</button></div>}
+      <ArchiveAssistant />
     </main>
   );
 }
