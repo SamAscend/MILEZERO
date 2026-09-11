@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Message = { role: "assistant" | "user"; text: string };
 
@@ -10,9 +10,14 @@ export default function ArchiveAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", text: "Welcome to the MILEZERO archive. What do you want to remember?" },
   ]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages, isLoading]);
 
   const sendMessage = async (text = input) => {
     const trimmed = text.trim();
@@ -48,6 +53,7 @@ export default function ArchiveAssistant() {
           <div className="assistant-messages" aria-live="polite">
             {messages.map((message, index) => <div className={`assistant-message ${message.role}`} key={`${message.role}-${index}`}>{message.text}</div>)}
             {isLoading && <div className="assistant-message assistant">Thinking about the archive...</div>}
+            <div ref={messagesEndRef} aria-hidden="true" />
           </div>
           <div className="assistant-quick-actions">{quickQuestions.map((question) => <button key={question} onClick={() => sendMessage(question)}>{question}</button>)}</div>
           <form className="assistant-form" onSubmit={(event) => { event.preventDefault(); sendMessage(); }}><input value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ask the archive..." aria-label="Ask the archive" /><button type="submit" aria-label="Send message">↗</button></form>
