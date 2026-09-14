@@ -28,11 +28,11 @@ export type GalleryItem = {
 };
 
 export const members: Member[] = [
-  { id: "sam", number: "01", name: "Sam", handle: "@sam", role: "Founder", image: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=900&q=85", bio: "Keeps the first step moving." },
-  { id: "raka", number: "02", name: "Raka", handle: "@raka", role: "Founder", image: "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?auto=format&fit=crop&w=900&q=85", bio: "Runs for the quiet after." },
-  { id: "nanda", number: "03", name: "Nanda", handle: "@nanda", role: "Founder", image: "https://images.unsplash.com/photo-1530137073528-4e9d4a2f6f58?auto=format&fit=crop&w=900&q=85", bio: "Finds rhythm in the long way home." },
-  { id: "dimas", number: "04", name: "Dimas", handle: "@dimas", role: "Founder", image: "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=85", bio: "Shows up, then shows up again." },
-  { id: "alia", number: "05", name: "Alia", handle: "@alia", role: "Founder", image: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=900&q=85", bio: "Makes space for the next runner." },
+  { id: "abid", number: "01", name: "Abid", handle: "@abid", role: "Founder", image: "/member-abid.jpg", bio: "Keeps the first step moving." },
+  { id: "ridho", number: "02", name: "Ridho", handle: "@ridho", role: "Founder", image: "/member-ridho.jpg", bio: "Runs for the quiet after." },
+  { id: "okta", number: "03", name: "Okta", handle: "@okta", role: "Founder", image: "/member-okta.jpg", bio: "Finds rhythm in the long way home." },
+  { id: "aden", number: "04", name: "Aden", handle: "@aden", role: "Founder", image: "/member-aden.jpg", bio: "Shows up, then shows up again." },
+  { id: "samuel", number: "05", name: "Samuel", handle: "@samuel", role: "Founder", image: "/member-samuel.jpg", bio: "Makes space for the next runner." },
 ];
 
 export const activities: Activity[] = [
